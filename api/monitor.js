@@ -18,11 +18,14 @@ export default function handler(req, res) {
         arch: os.arch(),
       },
       memory: {
+        total: `${Math.round(os.totalmem() / 1024 / 1024)} MB`,
+        free: `${Math.round(os.freemem() / 1024 / 1024)} MB`,
         rss: `${Math.round(memoryUsage.rss / 1024 / 1024)} MB`,
         heapTotal: `${Math.round(memoryUsage.heapTotal / 1024 / 1024)} MB`,
         heapUsed: `${Math.round(memoryUsage.heapUsed / 1024 / 1024)} MB`,
         percentUsed: Math.round((memoryUsage.heapUsed / memoryUsage.heapTotal) * 100)
       },
+      loadAvg: os.loadavg(),
       platform: os.platform(),
       uptime: os.uptime()
     }

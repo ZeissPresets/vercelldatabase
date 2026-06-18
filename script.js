@@ -48,8 +48,11 @@ async function fetchMetrics() {
         document.getElementById('cpu-speed').textContent = cpu.speed;
         document.getElementById('os-platform').textContent = data.server.platform;
         document.getElementById('server-uptime').textContent = formatUptime(data.server.uptime);
+        document.getElementById('load-avg').textContent = data.server.loadAvg[0].toFixed(2);
 
         // Update UI Memory
+        document.getElementById('ram-total').textContent = memory.total;
+        document.getElementById('ram-free').textContent = memory.free;
         document.getElementById('mem-used').textContent = memory.heapUsed;
         document.getElementById('mem-rss').textContent = memory.rss;
         document.getElementById('mem-progress').style.width = `${memory.percentUsed}%`;
@@ -85,5 +88,4 @@ function formatUptime(seconds) {
 // Initialize
 initChart();
 fetchMetrics();
-setInterval(fetchMetrics, 5000);
 setInterval(fetchMetrics, 5000);
