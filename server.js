@@ -12,6 +12,31 @@ const PORT = process.env.PORT || 3000;
 // Serve file statis (index.html, style.css, script.js)
 app.use(express.static(__dirname));
 
+// Background Task: Otomatis jalankan Garbage Collection setiap 1 menit 
+// jika penggunaan heap melebihi 70% atau dijalankan secara berkala
+setInterval(() => {
+  if (global.gc) {
+    const mem = process.memoryUsage();
+    const usedPercent = (mem.heapUsed / mem.heapTotal) * 100;
+    
+    // Jika penggunaan heap di atas 70%, bersihkan otomatis
+    if (usedPercent > 70) {
+      console.log(`[Auto-GC] Memory threshold reached (${usedPercent.toFixed(2)}%). Cleaning...`);
+      global.gc();
+    }
+  }
+}, 60000); // Cek setiap 60 detik
+
+// Endpoint untuk membersihkan memori (Garbage Collection)
+app.post('/api/clear-memory', (req, res) => {
+  if (global.gc) {
+    global.gc();
+    res.json({ success: true, message: 'Garbage Collection berhasil dijalankan' });
+  } else {
+    res.status(400).json({ success: false, message: 'GC tidak diekspos. Jalankan node dengan --expose-gc' });
+  }
+});
+
 // Replikasi endpoint API Vercel untuk jalankan lokal
 app.get('/api/monitor', (req, res) => {
   const cpus = os.cpus();

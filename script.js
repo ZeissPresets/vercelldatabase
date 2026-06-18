@@ -33,6 +33,25 @@ function initChart() {
     });
 }
 
+async function clearMemory() {
+    const btn = document.getElementById('clear-mem-btn');
+    btn.textContent = 'Clearing...';
+    try {
+        const response = await fetch('/api/clear-memory', { method: 'POST' });
+        const result = await response.json();
+        if (result.success) {
+            alert('Memory Heap berhasil dibersihkan!');
+            fetchMetrics();
+        } else {
+            alert('Gagal: ' + result.message);
+        }
+    } catch (e) {
+        alert('Fitur ini memerlukan server Node.js aktif dengan flag --expose-gc');
+    } finally {
+        btn.textContent = 'Clear Heap Memory';
+    }
+}
+
 async function fetchMetrics() {
     try {
         const response = await fetch('/api/monitor');
@@ -56,6 +75,13 @@ async function fetchMetrics() {
         document.getElementById('mem-used').textContent = memory.heapUsed;
         document.getElementById('mem-rss').textContent = memory.rss;
         document.getElementById('mem-progress').style.width = `${memory.percentUsed}%`;
+
+        // Auto-Trigger: Jika penggunaan memori > 80% terdeteksi di UI, 
+        // panggil fungsi pembersihan tanpa interaksi user
+        if (memory.percentUsed > 80) {
+            console.warn('High memory detected. Triggering auto-cleanup...');
+            clearMemory();
+        }
 
         // Update Chart
         const numericValue = parseInt(memory.heapUsed.replace(' MB', ''));
@@ -88,4 +114,5 @@ function formatUptime(seconds) {
 // Initialize
 initChart();
 fetchMetrics();
+document.getElementById('clear-mem-btn').addEventListener('click', clearMemory);
 setInterval(fetchMetrics, 5000);
