@@ -53,11 +53,51 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Storage Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Storage Information</h2>
+                </div>
+                <div class="stats">
+                    <div class="stat-item"><span>Total Storage:</span> <strong id="total-storage">-</strong></div>
+                    <div class="stat-item"><span>Used Storage:</span> <strong id="used-storage">-</strong></div>
+                    <div class="stat-item"><span>Free Storage:</span> <strong id="free-storage">-</strong></div>
+                </div>
+            </div>
+
+            <!-- Database Traffic Monitor -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Database Traffic</h2>
+                </div>
+                <div class="stats">
+                    <div class="stat-item"><span>Data Sent:</span> <strong id="sync-sent">0</strong></div>
+                    <div class="stat-item"><span>Data Received:</span> <strong id="sync-received">0</strong></div>
+                    <div class="stat-item"><span>Sync Latency:</span> <strong id="sync-latency">0ms</strong></div>
+                    <div class="stat-item"><span>Sync Status:</span> <strong id="sync-status" style="color: #00ff00;">Idle</strong></div>
+                </div>
+            </div>
+
+
+            <!-- Cleanup Logs Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Automatic Cleanup Logs</h2>
+                </div>
+                <div class="log-panel" id="log-list" style="max-height: 250px; overflow-y: auto; font-family: monospace; font-size: 0.85rem; padding: 10px; background: #000; color: #00ff00; border-radius: 4px;">
+                    <div class="log-item">Waiting for system logs...</div>
+                </div>
+            </div>
         </div>
         <footer>
             <p>Monitoring Vercel Lambda Instance | Refreshes every 5s</p>
         </footer>
     </div>
+    <style>
+        .log-item { border-bottom: 1px solid #222; padding: 5px 0; }
+        .log-item:last-child { border-bottom: none; }
+    </style>
     <script src="script.js"></script>
 </body>
 </html>
