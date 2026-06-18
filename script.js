@@ -20,7 +20,7 @@ function initChart() {
         data: {
             labels: chartLabels,
             datasets: [{
-                label: 'Heap Used (MB)',
+                label: 'RAM Usage (RSS) - MB',
                 data: chartData,
                 borderColor: '#0070f3',
                 backgroundColor: 'rgba(0, 112, 243, 0.1)',
@@ -63,7 +63,8 @@ async function fetchMetrics() {
         if (!response.ok) throw new Error('Network error');
         
         const data = await response.json();
-        const { cpu, memory, storage } = data.server; // Ambil juga 'storage'
+        const { server, storage } = data; // Storage ada di root data, bukan di data.server
+        const { cpu, memory } = server;
         
         // Kalkulasi berdasarkan limit 3000MB (RSS lebih akurat untuk limit RAM sistem)
         const rssValue = parseInt(memory.rss.replace(' MB', ''));
@@ -112,7 +113,8 @@ async function fetchMetrics() {
         }
 
         // Update Chart
-        const numericValue = parseInt(memory.heapUsed.replace(' MB', ''));
+        // Menggunakan rssValue (RAM Sistem) agar pergerakan grafik lebih dinamis dan akurat
+        const numericValue = rssValue; 
         const now = new Date().toLocaleTimeString();
         
         chartLabels.push(now);
@@ -123,7 +125,8 @@ async function fetchMetrics() {
             chartData.shift();
         }
 
-        memoryChart.update('none'); // Update without animation for performance
+        // Menghapus 'none' agar ada animasi transisi saat data berubah
+        memoryChart.update(); 
 
         document.getElementById('timestamp').textContent = `Last Update: ${new Date().toLocaleTimeString()}`;
     } catch (error) {
@@ -135,10 +138,15 @@ async function fetchMetrics() {
 async function fetchLogs() {
     try {
         const response = await fetch(INFINITY_FREE_BASE_URL + 'database/api_logs.php');
-        const data = await response.json();
+        const result = await response.json();
         
-        // Jika data adalah array (dari GET request)
-        const logs = Array.isArray(data) ? data : [];
+        // Handle format objek baru dari PHP
+        const logs = result.logs || [];
+        
+        // Update jumlah data diterima secara realtime dari database
+        dataReceivedCount = result.total_count || dataReceivedCount;
+        document.getElementById('sync-received').textContent = dataReceivedCount;
+
         const logList = document.getElementById('log-list');
         
         if (logs.length > 0) {

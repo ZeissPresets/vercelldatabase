@@ -1,5 +1,5 @@
 <?php
-// Sesuaikan dengan detail dari panel hosting InfinityFree Anda
+// Kredensial MySQL InfinityFree yang kamu berikan
 $host = 'sql105.infinityfree.com';
 $dbname = 'if0_42209756_logs';
 $username = 'if0_42209756';
