@@ -137,7 +137,14 @@ async function fetchMetrics() {
 
 async function fetchLogs() {
     try {
-        const response = await fetch(INFINITY_FREE_BASE_URL + 'database/api_logs.php');
+        const targetUrl = INFINITY_FREE_BASE_URL + 'database/api_logs.php';
+        const response = await fetch(targetUrl);
+        
+        if (!response.ok) {
+            console.error(`[FetchLogs Error] ${response.status}: ${targetUrl}`);
+            return;
+        }
+
         const result = await response.json();
         
         // Handle format objek baru dari PHP
@@ -167,15 +174,20 @@ async function syncToDatabase(payload) {
         document.getElementById('sync-status').textContent = 'Syncing...';
         document.getElementById('sync-status').style.color = '#ffaa00';
 
-        // Pastikan path ini sesuai dengan lokasi file di InfinityFree
-        // Menggunakan URL absolut agar Vercel bisa mengirim data ke database di InfinityFree
-        // Menyesuaikan dengan struktur folder htdocs di dalam database
+        // Menyelaraskan path agar sesuai dengan struktur folder: database/
         const apiPath = INFINITY_FREE_BASE_URL + 'database/api_logs.php';
         const response = await fetch(apiPath, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ data: payload })
         });
+
+        if (!response.ok) {
+            throw new Error(
+                `HTTP ${response.status}\nURL: ${apiPath}\n` +
+                `Cek apakah folder 'database' dan sub-folder 'htdocs' sudah dibuat di InfinityFree.`
+            );
+        }
 
         const result = await response.json();
         const endTime = performance.now();
@@ -192,7 +204,8 @@ async function syncToDatabase(payload) {
         }
     } catch (e) {
         console.error('Database Sync Failed:', e);
-        document.getElementById('sync-status').textContent = 'Failed';
+        // Menampilkan ringkasan error di status
+        document.getElementById('sync-status').textContent = e.message.includes('404') ? '404: Not Found' : 'Sync Error';
         document.getElementById('sync-status').style.color = '#ff4d4d';
     }
 }
