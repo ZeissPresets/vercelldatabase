@@ -14,6 +14,7 @@
                 <h1>System Monitor</h1>
                 <p id="timestamp">Status: Syncing...</p>
             </div>
+            <div id="db-status" class="badge" style="border-color: #00ff00; color: #00ff00; margin-right: 10px;">DB: Connected</div>
             <div id="auto-clean-status" class="badge">Auto-Clean: Active</div>
         </header>
 
@@ -47,7 +48,6 @@
                     <div class="stat-item"><span>Free RAM:</span> <strong id="ram-free">-</strong></div>
                     <div class="stat-item"><span>Heap Used:</span> <strong id="mem-used">-</strong></div>
                     <div class="stat-item"><span>RSS (Resident):</span> <strong id="mem-rss">-</strong></div>
-                    <button id="clear-mem-btn" class="btn-clear">Clear Heap Memory</button>
                     <div style="margin-top: 15px;">
                         <canvas id="memoryChart" height="150"></canvas>
                     </div>

@@ -2,6 +2,7 @@ let memoryChart;
 const maxDataPoints = 20;
 const chartLabels = [];
 const chartData = [];
+let syncCounter = 0;
 
 function initChart() {
     const ctx = document.getElementById('memoryChart').getContext('2d');
@@ -33,23 +34,17 @@ function initChart() {
     });
 }
 
-async function clearMemory(isAuto = false) {
-    const btn = document.getElementById('clear-mem-btn');
-    if (!isAuto) btn.textContent = 'Clearing...';
+async function clearMemory() {
+    console.log('[System] Initiating automatic memory cleanup...');
     try {
         const response = await fetch('/api/clear-memory', { method: 'POST' });
         const result = await response.json();
         if (result.success) {
-            if (!isAuto) alert('Memory Heap berhasil dibersihkan!');
-            else console.log('Auto-cleanup executed successfully');
+            console.log(`[System] ${result.message}`);
             fetchMetrics();
-        } else {
-            if (!isAuto) alert('Gagal: ' + result.message);
         }
     } catch (e) {
-        if (!isAuto) alert('Fitur ini memerlukan server Node.js aktif dengan flag --expose-gc');
-    } finally {
-        if (!isAuto) btn.textContent = 'Clear Heap Memory';
+        console.error('[System] Automatic cleanup failed. Ensure --expose-gc is active if running locally.');
     }
 }
 
@@ -81,7 +76,19 @@ async function fetchMetrics() {
         // panggil fungsi pembersihan tanpa interaksi user
         if (memory.percentUsed > 80) {
             console.warn('High memory detected. Triggering auto-cleanup...');
-            clearMemory(true);
+            clearMemory();
+        }
+
+        // Database Sync: Hanya kirim ke DB setiap 30 detik (6 x 5 detik)
+        // Agar InfinityFree tidak menganggap ini sebagai serangan spam/flood
+        syncCounter++;
+        if (syncCounter >= 6) {
+            syncToDatabase({
+                heapUsed: memory.heapUsed,
+                cpuLoad: data.server.loadAvg[0],
+                timestamp: new Date().toISOString()
+            });
+            syncCounter = 0;
         }
 
         // Update Chart
@@ -105,6 +112,18 @@ async function fetchMetrics() {
     }
 }
 
+async function syncToDatabase(payload) {
+    try {
+        await fetch('/api/logs', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ data: payload })
+        });
+    } catch (e) {
+        console.error('Database Sync Failed:', e);
+    }
+}
+
 function formatUptime(seconds) {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
@@ -115,5 +134,4 @@ function formatUptime(seconds) {
 // Initialize
 initChart();
 fetchMetrics();
-document.getElementById('clear-mem-btn').addEventListener('click', clearMemory);
 setInterval(fetchMetrics, 5000);

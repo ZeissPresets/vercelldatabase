@@ -2,6 +2,7 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import os from 'os';
+import fetch from 'node-fetch'; // Pastikan install node-fetch jika di lokal
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,8 +20,8 @@ setInterval(() => {
     const mem = process.memoryUsage();
     const usedPercent = (mem.heapUsed / mem.heapTotal) * 100;
     
-    // Jika penggunaan heap di atas 70%, bersihkan otomatis
-    if (usedPercent > 70) {
+    // Disamakan dengan threshold dashboard (80%)
+    if (usedPercent > 80) {
       console.log(`[Auto-GC] Memory threshold reached (${usedPercent.toFixed(2)}%). Cleaning...`);
       global.gc();
     }
