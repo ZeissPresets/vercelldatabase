@@ -168,8 +168,8 @@ async function syncToDatabase(payload) {
         document.getElementById('sync-status').style.color = '#ffaa00';
 
         // Pastikan path ini sesuai dengan lokasi file di InfinityFree
-        // Jika file api_logs.php ada di htdocs langsung (bukan folder database), hapus '/database'
         // Menggunakan URL absolut agar Vercel bisa mengirim data ke database di InfinityFree
+        // Menyesuaikan dengan struktur folder htdocs di dalam database
         const apiPath = INFINITY_FREE_BASE_URL + 'database/api_logs.php';
         const response = await fetch(apiPath, {
             method: 'POST',
