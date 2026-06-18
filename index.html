@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vercel System Monitor</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>System Monitor</h1>
+            <p id="timestamp">Status: Syncing...</p>
+        </header>
+
+        <div class="grid">
+            <!-- CPU Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>CPU Information</h2>
+                </div>
+                <div class="stats">
+                    <div class="stat-item"><span>Model:</span> <strong id="cpu-model">-</strong></div>
+                    <div class="stat-item"><span>Architecture:</span> <strong id="cpu-arch">-</strong></div>
+                    <div class="stat-item"><span>Logical Cores:</span> <strong id="cpu-cores">-</strong></div>
+                    <div class="stat-item"><span>Speed:</span> <strong id="cpu-speed">-</strong></div>
+                    <div class="stat-item"><span>OS Platform:</span> <strong id="os-platform">-</strong></div>
+                    <div class="stat-item"><span>Server Uptime:</span> <strong id="server-uptime">-</strong></div>
+                </div>
+            </div>
+
+            <!-- Memory Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Server Memory</h2>
+                </div>
+                <div class="stats">
+                    <div class="progress-container">
+                        <div id="mem-progress" class="progress-bar" style="width: 0%"></div>
+                    </div>
+                    <div class="stat-item"><span>Heap Used:</span> <strong id="mem-used">-</strong></div>
+                    <div class="stat-item"><span>RSS (Resident):</span> <strong id="mem-rss">-</strong></div>
+                    <div style="margin-top: 15px;">
+                        <canvas id="memoryChart" height="150"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <footer>
+            <p>Monitoring Vercel Lambda Instance | Refreshes every 5s</p>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

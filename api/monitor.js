@@ -1,0 +1,30 @@
+import os from 'os';
+
+export default function handler(req, res) {
+  // Mengambil info CPU dari OS
+  const cpus = os.cpus();
+  const cpuModel = cpus.length > 0 ? cpus[0].model : 'Unknown';
+  const cpuSpeed = cpus.length > 0 ? cpus[0].speed : 0;
+  
+  // Mengambil info memori dari proses Node.js yang sedang berjalan
+  const memoryUsage = process.memoryUsage();
+
+  res.status(200).json({
+    server: {
+      cpu: {
+        model: cpuModel,
+        cores: cpus.length,
+        speed: `${cpuSpeed} MHz`,
+        arch: os.arch(),
+      },
+      memory: {
+        rss: `${Math.round(memoryUsage.rss / 1024 / 1024)} MB`,
+        heapTotal: `${Math.round(memoryUsage.heapTotal / 1024 / 1024)} MB`,
+        heapUsed: `${Math.round(memoryUsage.heapUsed / 1024 / 1024)} MB`,
+        percentUsed: Math.round((memoryUsage.heapUsed / memoryUsage.heapTotal) * 100)
+      },
+      platform: os.platform(),
+      uptime: os.uptime()
+    }
+  });
+}
