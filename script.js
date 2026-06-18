@@ -33,22 +33,23 @@ function initChart() {
     });
 }
 
-async function clearMemory() {
+async function clearMemory(isAuto = false) {
     const btn = document.getElementById('clear-mem-btn');
-    btn.textContent = 'Clearing...';
+    if (!isAuto) btn.textContent = 'Clearing...';
     try {
         const response = await fetch('/api/clear-memory', { method: 'POST' });
         const result = await response.json();
         if (result.success) {
-            alert('Memory Heap berhasil dibersihkan!');
+            if (!isAuto) alert('Memory Heap berhasil dibersihkan!');
+            else console.log('Auto-cleanup executed successfully');
             fetchMetrics();
         } else {
-            alert('Gagal: ' + result.message);
+            if (!isAuto) alert('Gagal: ' + result.message);
         }
     } catch (e) {
-        alert('Fitur ini memerlukan server Node.js aktif dengan flag --expose-gc');
+        if (!isAuto) alert('Fitur ini memerlukan server Node.js aktif dengan flag --expose-gc');
     } finally {
-        btn.textContent = 'Clear Heap Memory';
+        if (!isAuto) btn.textContent = 'Clear Heap Memory';
     }
 }
 
@@ -80,7 +81,7 @@ async function fetchMetrics() {
         // panggil fungsi pembersihan tanpa interaksi user
         if (memory.percentUsed > 80) {
             console.warn('High memory detected. Triggering auto-cleanup...');
-            clearMemory();
+            clearMemory(true);
         }
 
         // Update Chart
